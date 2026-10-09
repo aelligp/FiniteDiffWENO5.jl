@@ -24,16 +24,18 @@ end
         N = length(dims)
         labels = (:x, :y, :z)[1:N]
         u0 = rand(dims...)
-        v = NamedTuple{labels}(ntuple(N) do d
-            vd = randn(ntuple(k -> dims[k] + (k == d), N)...)
-            if periodic
-                selectdim(vd, d, dims[d] + 1) .= selectdim(vd, d, 1)
-            else
-                selectdim(vd, d, 1) .= 0
-                selectdim(vd, d, dims[d] + 1) .= 0
+        v = NamedTuple{labels}(
+            ntuple(N) do d
+                vd = randn(ntuple(k -> dims[k] + (k == d), N)...)
+                if periodic
+                    selectdim(vd, d, dims[d] + 1) .= selectdim(vd, d, 1)
+                else
+                    selectdim(vd, d, 1) .= 0
+                    selectdim(vd, d, dims[d] + 1) .= 0
+                end
+                vd
             end
-            vd
-        end)
+        )
         Δt = 0.1
         Δs = ntuple(_ -> 1.0, N)
         bc = periodic ? PeriodicBC() : ExtrapolateBC()
